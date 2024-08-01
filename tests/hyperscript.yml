@@ -1,0 +1,27 @@
+global:
+  url: https://freetestapi.com
+
+run:
+  - name: Get All Car
+    path: /api/v1/cars
+    expect:
+      contentType: application/json
+      status: 200
+
+  - name: Get Single Car
+    path: /api/v1/cars/1
+    expect:
+      contentType: application/json
+      status:
+        - value: 200
+        - value: 201
+      contains:
+        id: 1
+      lessThan:
+        price: 30000
+      greaterThan:
+        year: 2010
+      body:
+        make: Toyota
+        model: Corolla
+        color: Silver
