@@ -1,4 +1,3 @@
-import argparse
 from colorama import Fore, init
 import requests
 import yaml
