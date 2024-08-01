@@ -1,5 +1,5 @@
 import argparse
-from hyperscript.parser import parse_config, TestRunner
+from .parser import parse_config, TestRunner
 from colorama import Fore
 
 def main():
