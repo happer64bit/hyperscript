@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='Hyperscript Cli',
+    name='hyperscript-cli',
     version='1.0',
     description='Powerful HTTP Request Tester',
     long_description=open('README.md').read(),
@@ -11,7 +11,7 @@ setup(
     url='https://github.com/happer64bit/hyperscript',  # URL to the project repository
     packages=find_packages(),
     install_requires=[
-        "request"
+        'requests',  # Fixed typo
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
