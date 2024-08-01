@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='Hyperscript',
+    name='Hyperscript Cli',
     version='1.0',
     description='Powerful HTTP Request Tester',
     long_description=open('README.md').read(),
@@ -30,7 +30,7 @@ setup(
     python_requires='>=3.8',
     entry_points={
         'console_scripts': [
-            'hyperscript=hyperscript.__main__:main',
+            'hyperscript=hyperscript_cli.__main__:main',
         ],
     },
     include_package_data=True,
