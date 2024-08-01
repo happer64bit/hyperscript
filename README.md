@@ -14,7 +14,7 @@
 To install Hyperscript, use pip:
 
 ```bash
-pip install hyperscript
+pip install hyperscript-cli
 ```
 
 ## Usage
