@@ -8,7 +8,7 @@ setup(
     long_description_content_type='text/markdown',
     author='Happer',
     author_email='happer64bit@gmail.com',
-    url='https://github.com/happer64bit/hyperscript',  # URL to the project repository
+    url='https://github.com/happer64bit/hyperscript',
     packages=find_packages(),
     install_requires=[
         'requests',  # Fixed typo

@@ -4,7 +4,7 @@ import yaml
 
 init(autoreset=True)
 
-class TestRunner:
+class Parser:
     def __init__(self, config, skip_error, verbose=False):
         self.config = config
         self.skip_error = skip_error
