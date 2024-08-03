@@ -1,25 +1,25 @@
 # Hyperscript
 
-**Hyperscript** is a powerful and flexible script for handling complex configurations and requests. It supports various HTTP methods including GET, POST, PUT, and DELETE, and provides extensive options for validating responses against specified conditions.
+**Hyperscript** is a tool for testing HTTP requests with flexible configuration and validation.
 
 ## Features
 
-- **Support for Multiple HTTP Methods**: Easily configure and test GET, POST, PUT, and DELETE requests.
-- **Flexible Validation**: Validate responses based on status codes, content types, and specific body content.
-- **Customizable Conditions**: Check if response bodies contain certain values, or if numeric fields are within specified ranges.
-- **Detailed Reporting**: Get detailed success and failure messages, with optional verbose output.
+- **HTTP Methods**: Test GET, POST, PUT, and DELETE requests.
+- **Validation**: Check status codes, content types, and body content.
+- **Conditions**: Validate if responses contain specific values or if numeric fields meet criteria.
+- **Reporting**: Detailed success and failure messages, with optional verbose output.
 
 ## Installation
 
-To install Hyperscript, use pip:
+Install with pip:
 
 ```bash
 pip install hyperscript-cli
 ```
 
-## Usage
+## Configuration
 
-Create a YAML configuration file (`config.yaml`) to specify your tests. Here's an example configuration:
+Create a YAML file (`config.yaml`) for your tests. Example:
 
 ```yaml
 global:
@@ -51,32 +51,55 @@ run:
         color: Silver
 ```
 
-To run the tests, use the command line:
+### Environment Variables
+
+You can use environment variables in your configuration. For example, use `{{VARIABLE_NAME}}` syntax to reference environment variables. 
+
+Set environment variables before running your tests:
+
+```bash
+export BASE_URL=https://freetestapi.com
+export CAR_ID=1
+```
+
+Update `config.yaml` to use these variables:
+
+```yaml
+global:
+  url: "{{BASE_URL}}"
+
+run:
+  - name: Get Single Car
+    path: /api/v1/cars/{{CAR_ID}}
+    expect:
+      contentType: application/json
+      status:
+        - value: 200
+        - value: 201
+```
+
+## Usage
+
+Run tests:
 
 ```bash
 hyperscript path/to/config.yaml
 ```
 
-### Command Line Options
+### Options
 
-- `--skip-error`: Skip error handling and continue with the next test.
-
-### Example
-
-Here’s how you can run the tests with verbose output:
-
-```bash
-hyperscript path/to/config.yaml --verbose
-```
+- `--skip-error`: Continue with the next test on error.
+- `--verbose`: Enable detailed logging.
 
 ## Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
+Fork the repository and submit a pull request with your changes.
 
 ## License
 
-Hyperscript is released under the MIT License. See the [LICENSE](LICENSE) file for more details.
+MIT License. See the [LICENSE](LICENSE) file.
 
 ## Contact
 
-For any questions or feedback, please contact [happer64bit@gmail.com](mailto:happer64bit@gmail.com).
+For questions, email [happer64bit@gmail.com](mailto:happer64bit@gmail.com).
+
