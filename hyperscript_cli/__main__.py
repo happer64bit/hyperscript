@@ -1,5 +1,5 @@
 import argparse
-from .parser import parse_config, TestRunner
+from .parser import parse_config, Parser
 from colorama import Fore
 
 def main():
@@ -11,7 +11,7 @@ def main():
 
     try:
         config = parse_config(args.config_file)
-        runner = TestRunner(config, args.skip_error, args.verbose)
+        runner = Parser(config, args.skip_error, args.verbose)
         runner.run_test()
         runner.show_summary()
     except Exception as e:

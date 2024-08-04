@@ -1,12 +1,14 @@
 from colorama import Fore, init
 import requests
 import yaml
+import os
+import re
 
 init(autoreset=True)
 
-class TestRunner:
+class Parser:
     def __init__(self, config, skip_error, verbose=False):
-        self.config = config
+        self.config = self._process_env_vars(config)
         self.skip_error = skip_error
         self.verbose = verbose
         self.success_count = 0
@@ -139,6 +141,19 @@ class TestRunner:
         print(f"\n{Fore.GREEN}SUCCESS: {self.success_count}{Fore.RESET}, "
               f"{Fore.RED}FAILURE: {self.fail_count}{Fore.RESET}, "
               f"{Fore.WHITE}TOTAL: {total_tests}{Fore.RESET}\n")
+
+    def _process_env_vars(self, config):
+        """Replace placeholders in the config with environment variable values."""
+        def replace_env_vars(value):
+            if isinstance(value, str):
+                return re.sub(r'\{\{(\w+)\}\}', lambda match: os.getenv(match.group(1), match.group(0)), value)
+            elif isinstance(value, dict):
+                return {k: replace_env_vars(v) for k, v in value.items()}
+            elif isinstance(value, list):
+                return [replace_env_vars(v) for v in value]
+            return value
+
+        return replace_env_vars(config)
 
 def parse_config(config_file):
     try:

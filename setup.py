@@ -2,13 +2,13 @@ from setuptools import setup, find_packages
 
 setup(
     name='hyperscript-cli',
-    version='1.0.2',
+    version='1.0.3',
     description='Powerful HTTP Request Tester',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     author='Happer',
     author_email='happer64bit@gmail.com',
-    url='https://github.com/happer64bit/hyperscript',  # URL to the project repository
+    url='https://github.com/happer64bit/hyperscript',
     packages=find_packages(),
     install_requires=[
         'requests',  # Fixed typo
