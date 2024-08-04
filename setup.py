@@ -1,4 +1,5 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
+import os
 
 setup(
     name='hyperscript-cli',
@@ -11,7 +12,7 @@ setup(
     url='https://github.com/happer64bit/hyperscript',
     packages=find_packages(),
     install_requires=[
-        'requests',  # Fixed typo
+        'requests',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

@@ -1,1 +1,4 @@
 requests
+colorama
+Cython
+python_msvc
