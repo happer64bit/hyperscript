@@ -1,3 +1,4 @@
+from typing import Dict, Any, Union, List
 from colorama import Fore, init
 import requests
 import yaml
@@ -7,14 +8,14 @@ import re
 init(autoreset=True)
 
 class Parser:
-    def __init__(self, config, skip_error, verbose=False):
+    def __init__(self, config: Dict[str, Any], skip_error: bool, verbose: bool = False) -> None:
         self.config = self._process_env_vars(config)
         self.skip_error = skip_error
         self.verbose = verbose
         self.success_count = 0
         self.fail_count = 0
 
-    def run_test(self):
+    def run_test(self) -> None:
         global_url = self.config['global']['url']
         global_headers = self.config['global'].get('headers', {})
         global_cookies = self.config['global'].get('cookies', {})
@@ -38,7 +39,7 @@ class Parser:
             except Exception as e:
                 self._handle_error(f"Unexpected error occurred: {str(e)}", name)
 
-    def _check_response(self, response, expect, name):
+    def _check_response(self, response: requests.Response, expect: Dict[str, Any], name: str) -> None:
         try:
             expected_status = expect.get('status')
             expected_content_type = expect.get('contentType')
@@ -87,7 +88,7 @@ class Parser:
         except Exception as e:
             self._handle_error(f"ERROR DURING RESPONSE VALIDATION: {str(e)}", name)
 
-    def _compare_nested(self, actual, expected):
+    def _compare_nested(self, actual: Any, expected: Any) -> bool:
         if isinstance(expected, dict):
             for key, value in expected.items():
                 if key not in actual or not self._compare_nested(actual[key], value):
@@ -95,25 +96,25 @@ class Parser:
             return True
         return actual == expected
 
-    def _compare_contains(self, actual, contains):
+    def _compare_contains(self, actual: Any, contains: Dict[str, Any]) -> bool:
         for key, value in contains.items():
             if key not in actual or actual[key] != value:
                 return False
         return True
 
-    def _compare_less_than(self, actual, less_than):
+    def _compare_less_than(self, actual: Any, less_than: Dict[str, Any]) -> bool:
         for key, value in less_than.items():
             if key not in actual or not actual[key] < value:
                 return False
         return True
 
-    def _compare_greater_than(self, actual, greater_than):
+    def _compare_greater_than(self, actual: Any, greater_than: Dict[str, Any]) -> bool:
         for key, value in greater_than.items():
             if key not in actual or not actual[key] > value:
                 return False
         return True
 
-    def _handle_error(self, message, name):
+    def _handle_error(self, message: str, name: str) -> None:
         simplified_message = message
         if 'Max retries exceeded' in message:
             simplified_message = "Unable to connect to the server. Please check if the server is running and reachable."
@@ -131,20 +132,20 @@ class Parser:
         if not self.skip_error:
             raise RuntimeError(simplified_message)
 
-    def _log_success(self, name):
+    def _log_success(self, name: str) -> None:
         success_message = f"{Fore.GREEN}✔ SUCCESS: {name}{Fore.RESET}"
         print(success_message)
         self.success_count += 1
 
-    def show_summary(self):
+    def show_summary(self) -> None:
         total_tests = self.success_count + self.fail_count
         print(f"\n{Fore.GREEN}SUCCESS: {self.success_count}{Fore.RESET}, "
               f"{Fore.RED}FAILURE: {self.fail_count}{Fore.RESET}, "
               f"{Fore.WHITE}TOTAL: {total_tests}{Fore.RESET}\n")
 
-    def _process_env_vars(self, config):
+    def _process_env_vars(self, config: Dict[str, Any]) -> Dict[str, Any]:
         """Replace placeholders in the config with environment variable values."""
-        def replace_env_vars(value):
+        def replace_env_vars(value: Any) -> Any:
             if isinstance(value, str):
                 return re.sub(r'\{\{(\w+)\}\}', lambda match: os.getenv(match.group(1), match.group(0)), value)
             elif isinstance(value, dict):
@@ -155,7 +156,7 @@ class Parser:
 
         return replace_env_vars(config)
 
-def parse_config(config_file):
+def parse_config(config_file: str) -> Dict[str, Any]:
     try:
         with open(config_file, 'r') as file:
             config = yaml.safe_load(file)
