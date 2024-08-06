@@ -32,6 +32,8 @@ setup(
         'requests',
         'pyyaml',
         'colorama',
+        'Cython',
+        'python_msvc'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
