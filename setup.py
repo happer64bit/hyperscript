@@ -1,11 +1,28 @@
 from setuptools import setup, find_packages, Extension
+from Cython.Build import cythonize
 import os
+
+long_description = ""
+if os.path.exists('README.md'):
+    with open('README.md', 'r') as file:
+        long_description = file.read()
+
+# Define Cython extension
+extensions = [
+    Extension(
+        name="hyperscript_cli.parser",
+        sources=["hyperscript_cli/parser.pyx"],
+        extra_compile_args=['/O2']
+    )
+]
+
+cython_directives = {'embedsignature': True}
 
 setup(
     name='hyperscript-cli',
     version='1.0.4',
     description='Powerful HTTP Request Tester',
-    long_description=open('README.md').read(),
+    long_description=long_description,
     long_description_content_type='text/markdown',
     author='Happer',
     author_email='happer64bit@gmail.com',
@@ -13,6 +30,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'requests',
+        'pyyaml',
+        'colorama',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -36,4 +55,5 @@ setup(
     },
     include_package_data=True,
     zip_safe=False,
+    ext_modules=cythonize(extensions, compiler_directives=cython_directives, language_level='3'),
 )

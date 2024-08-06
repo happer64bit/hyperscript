@@ -2,6 +2,8 @@
 
 **Hyperscript** is a tool for testing HTTP requests with flexible configuration and validation.
 
+<a href="https://www.producthunt.com/posts/hyperscript?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-hyperscript" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=476454&theme=light" alt="HyperScript - Powerful&#0032;HTTP&#0032;Request&#0032;Tester&#0032;⌚ | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+
 ## Features
 
 - **HTTP Methods**: Test GET, POST, PUT, and DELETE requests.
