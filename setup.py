@@ -20,7 +20,7 @@ cython_directives = {'embedsignature': True}
 
 setup(
     name='hyperscript-cli',
-    version='1.0.4',
+    version='1.0.5',
     description='Powerful HTTP Request Tester',
     long_description=long_description,
     long_description_content_type='text/markdown',
