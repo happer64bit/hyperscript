@@ -1,3 +1,4 @@
+import threading
 from typing import Dict, Any, Union, List
 from colorama import Fore, init
 import requests
@@ -8,12 +9,13 @@ import re
 init(autoreset=True)
 
 class Parser:
-    def __init__(self, config: Dict[str, Any], skip_error: bool, verbose: bool = False) -> None:
+    def __init__(self, config: Dict[str, Any], skip_error: bool, verbose: bool = False, concurrency: int = None) -> None:
         self.config = self._process_env_vars(config)
         self.skip_error = skip_error
         self.verbose = verbose
         self.success_count = 0
         self.fail_count = 0
+        self.concurrency = concurrency
 
     def run_test(self) -> None:
         global_url = self.config['global']['url']
@@ -22,22 +24,37 @@ class Parser:
 
         print(f"\n{Fore.CYAN}Running tests...\n{Fore.RESET}")
 
-        for run in self.config['run']:
-            name = run['name']
-            path = run['path']
-            url = global_url + path
-            method = run.get('method', 'GET').upper()
-            headers = {**global_headers, **run.get('headers', {})}
-            cookies = {**global_cookies, **run.get('cookies', {})}
-            data = run.get('body', {})
+        # Run tests concurrently if concurrency is specified
+        if self.concurrency:
+            threads = []
+            for run in self.config['run']:
+                t = threading.Thread(target=self._run_single_test, args=(run, global_url, global_headers, global_cookies))
+                threads.append(t)
+                t.start()
 
-            try:
-                response = requests.request(method, url, headers=headers, cookies=cookies, json=data)
-                self._check_response(response, run['expect'], name)
-            except requests.RequestException as e:
-                self._handle_error(f"{str(e)}", name)
-            except Exception as e:
-                self._handle_error(f"Unexpected error occurred: {str(e)}", name)
+            # Wait for all threads to complete
+            for t in threads:
+                t.join()
+        else:
+            for run in self.config['run']:
+                self._run_single_test(run, global_url, global_headers, global_cookies)
+
+    def _run_single_test(self, run: Dict[str, Any], global_url: str, global_headers: Dict[str, Any], global_cookies: Dict[str, Any]) -> None:
+        name = run['name']
+        path = run['path']
+        url = global_url + path
+        method = run.get('method', 'GET').upper()
+        headers = {**global_headers, **run.get('headers', {})}
+        cookies = {**global_cookies, **run.get('cookies', {})}
+        data = run.get('body', {})
+
+        try:
+            response = requests.request(method, url, headers=headers, cookies=cookies, json=data)
+            self._check_response(response, run['expect'], name)
+        except requests.RequestException as e:
+            self._handle_error(f"{str(e)}", name)
+        except Exception as e:
+            self._handle_error(f"Unexpected error occurred: {str(e)}", name)
 
     def _check_response(self, response: requests.Response, expect: Dict[str, Any], name: str) -> None:
         try:
@@ -47,6 +64,7 @@ class Parser:
             contains = expect.get('contains')
             less_than = expect.get('lessThan')
             greater_than = expect.get('greaterThan')
+            equal_to = expect.get('equalTo')
 
             # Check response status code
             if isinstance(expected_status, list):
@@ -84,6 +102,11 @@ class Parser:
                 self._handle_error(f"RESPONSE VALUES ARE NOT GREATER THAN EXPECTED", name)
                 return
 
+            # Check if response values are equal to expected values
+            if equal_to and not self._compare_equal_to(response_json, equal_to):
+                self._handle_error(f"RESPONSE VALUES DO NOT MATCH EXPECTED", name)
+                return
+
             self._log_success(name)
         except Exception as e:
             self._handle_error(f"ERROR DURING RESPONSE VALIDATION: {str(e)}", name)
@@ -111,6 +134,12 @@ class Parser:
     def _compare_greater_than(self, actual: Any, greater_than: Dict[str, Any]) -> bool:
         for key, value in greater_than.items():
             if key not in actual or not actual[key] > value:
+                return False
+        return True
+
+    def _compare_equal_to(self, actual: Any, equal_to: Dict[str, Any]) -> bool:
+        for key, value in equal_to.items():
+            if key not in actual or actual[key] != value:
                 return False
         return True
 

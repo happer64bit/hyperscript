@@ -3,7 +3,7 @@ import os
 
 setup(
     name='hyperscript-cli',
-    version='1.0.4',
+    version='1.0.6',
     description='Powerful HTTP Request Tester',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
@@ -13,6 +13,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'requests',
+        'colorama'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
