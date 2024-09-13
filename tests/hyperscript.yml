@@ -1,5 +1,7 @@
 global:
   url: https://freetestapi.com
+  header:
+    Authorization: TOKEN
 
 run:
   - name: Get All Car
