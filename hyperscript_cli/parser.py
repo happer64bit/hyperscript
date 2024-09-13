@@ -18,7 +18,10 @@ class Parser:
         self.concurrency = concurrency
 
     def run_test(self) -> None:
+        # Provide default values for retries and timeout
         global_url = self.config['global']['url']
+        global_request_retries = self.config['global'].get('retries', 0)  # Default to 0 retries
+        global_request_timeout = self.config['global'].get('timeout', None)  # Default to None for no timeout
         global_headers = self.config['global'].get('headers', {})
         global_cookies = self.config['global'].get('cookies', {})
 
@@ -28,7 +31,7 @@ class Parser:
         if self.concurrency:
             threads = []
             for run in self.config['run']:
-                t = threading.Thread(target=self._run_single_test, args=(run, global_url, global_headers, global_cookies))
+                t = threading.Thread(target=self._run_single_test, args=(run, global_url, global_headers, global_cookies, global_request_retries, global_request_timeout))
                 threads.append(t)
                 t.start()
 
@@ -37,9 +40,9 @@ class Parser:
                 t.join()
         else:
             for run in self.config['run']:
-                self._run_single_test(run, global_url, global_headers, global_cookies)
+                self._run_single_test(run, global_url, global_headers, global_cookies, global_request_retries, global_request_timeout)
 
-    def _run_single_test(self, run: Dict[str, Any], global_url: str, global_headers: Dict[str, Any], global_cookies: Dict[str, Any]) -> None:
+    def _run_single_test(self, run: Dict[str, Any], global_url: str, global_headers: Dict[str, Any], global_cookies: Dict[str, Any], retries: int, timeout: Union[None, int]) -> None:
         name = run['name']
         path = run['path']
         url = global_url + path
@@ -48,13 +51,20 @@ class Parser:
         cookies = {**global_cookies, **run.get('cookies', {})}
         data = run.get('body', {})
 
-        try:
-            response = requests.request(method, url, headers=headers, cookies=cookies, json=data)
-            self._check_response(response, run['expect'], name)
-        except requests.RequestException as e:
-            self._handle_error(f"{str(e)}", name)
-        except Exception as e:
-            self._handle_error(f"Unexpected error occurred: {str(e)}", name)
+        for attempt in range(retries + 1):
+            try:
+                response = requests.request(method, url, headers=headers, cookies=cookies, json=data, timeout=timeout)
+                self._check_response(response, run['expect'], name)
+                break  # If request is successful, break out of retry loop
+            except requests.RequestException as e:
+                if attempt < retries:
+                    if self.verbose:
+                        print(f"Attempt {attempt + 1} failed. Retrying...")
+                    continue  # Retry on failure
+                self._handle_error(f"{str(e)}", name)
+            except Exception as e:
+                self._handle_error(f"Unexpected error occurred: {str(e)}", name)
+                break
 
     def _check_response(self, response: requests.Response, expect: Dict[str, Any], name: str) -> None:
         try:

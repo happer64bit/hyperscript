@@ -3,7 +3,7 @@ import os
 
 setup(
     name='hyperscript-cli',
-    version='1.0.6',
+    version='1.0.7',
     description='Powerful HTTP Request Tester',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
